@@ -12,13 +12,11 @@ repository: "tom-harris-MIT/tom-harris-MIT.github.io"
 author:
   name: "Tom Harris"
   avatar: "profile.jpg"
-  bio: "PhD Student in Economics at LSE. Research interests in public economics, environmental economics, and development economics."
-  location: "London, UK"
-  employer: "London School of Economics"
+  bio: "PhD Student in Economics"
+  location: "London School of Economics"
   email: "t.m.harris@lse.ac.uk"
   linkedin: "tom-harris-mit"
   github: "tom-harris-MIT"
-  googlescholar: # Add your Google Scholar ID here if you have one
 
 # Reading Files
 include:

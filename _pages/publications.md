@@ -19,7 +19,7 @@ With Thomas Rutter, Shankar Iyer et al. (2025)
 This paper measures social capital across the United Kingdom using anonymized Facebook data covering six billion friendships. We construct novel measures of social connectedness and economic connectedness at granular geographic levels and examine their relationship with economic mobility and other outcomes.
 </details>
 
-![Economic Connectedness in the UK](/images/uk_social_capital.jpg)
+![Economic Connectedness in the UK](/images/uk_social_capital.png)
 
 ---
 
