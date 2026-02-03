@@ -45,7 +45,7 @@
         nav {
             border-bottom: 1px solid var(--border);
             padding: 1rem 0;
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
         }
 
         .nav-container {
@@ -94,15 +94,16 @@
         /* About Section */
         .about {
             display: flex;
-            gap: 2.5rem;
+            gap: 3rem;
             align-items: flex-start;
         }
 
         .about-photo {
-            width: 180px;
-            height: 180px;
+            width: 220px;
+            height: 220px;
             object-fit: cover;
             flex-shrink: 0;
+            border-radius: 4px;
         }
 
         .about-content h1 {
@@ -120,8 +121,12 @@
             color: var(--accent);
         }
 
+        .about-content p:last-of-type {
+            margin-bottom: 0;
+        }
+
         .contact-info {
-            margin-top: 1.5rem;
+            margin-top: 1.75rem;
             font-size: 0.95rem;
         }
 
@@ -135,6 +140,7 @@
 
         .contact-info a:hover {
             color: var(--accent);
+            text-decoration: none;
         }
 
         /* Footer */
@@ -157,8 +163,8 @@
             }
 
             .about-photo {
-                width: 150px;
-                height: 150px;
+                width: 180px;
+                height: 180px;
             }
 
             .nav-links {
@@ -186,6 +192,7 @@
                 <a href="index.html" class="active">Home</a>
                 <a href="research.html">Research</a>
                 <a href="cv.pdf">CV</a>
+                <a href="more.html">More</a>
             </div>
         </div>
     </nav>
@@ -196,17 +203,23 @@
             <div class="about-content">
                 <h1>Welcome!</h1>
                 <p>
-                    I am a PhD student in economics at the <a href="https://www.lse.ac.uk/economics">London School of Economics</a>. My primary research interests are in public economics, environmental economics, and development economics.
+                    I'm a PhD student in economics at the <a href="https://www.lse.ac.uk/economics">London School of Economics</a>. My research focuses on public economics, environmental economics, and development economics.
                 </p>
                 <p>
-                    Before starting my PhD, I worked as a predoctoral fellow for <a href="https://rajchetty.com/">Raj Chetty</a> at <a href="https://opportunityinsights.org/">Opportunity Insights</a>, Harvard University, where I researched the causal effect of social connections on economic opportunity using Facebook data.
+                    Before starting my PhD, I worked as a predoctoral fellow at <a href="https://opportunityinsights.org/">Opportunity Insights</a>, where I collaborated with <a href="https://rajchetty.com/">Raj Chetty</a>, <a href="https://web.stanford.edu/~jacksonm/">Matthew Jackson</a>, <a href="https://pages.stern.nyu.edu/~tkuchler/">Theresa Kuchler</a>, <a href="https://www.johannesstroebel.com/">Johannes Stroebel</a>, and Meta's Central Applied Science team on projects measuring social capital using data from billions of Facebook friendships.
+                </p>
+                <p>
+                    I've also worked as a consultant at the <a href="https://www.worldbank.org/en/about/unit/unit-dec/impactevaluation">World Bank's Development Impact Group</a>, and as an economist in the <a href="https://www.gov.uk/government/organisations/government-economic-service">UK Government Economic Service</a>. I hold a Master's from <a href="https://micromasters.mit.edu/dedp/">MIT's Data, Economics and Development Policy program</a>.
+                </p>
+                <p>
+                    Outside of research, you can find me playing mediocre football, tennis and chess or planning my next hiking trip.
                 </p>
                 <div class="contact-info">
-                    <a href="mailto:t.m.harris@lse.ac.uk">
+                    <a href="/cdn-cgi/l/email-protection#b3c79dde9ddbd2c1c1dac0f3dfc0d69dd2d09dc6d8">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                             <path d="M.05 3.555A2 2 0 0 1 2 2h12a2 2 0 0 1 1.95 1.555L8 8.414.05 3.555ZM0 4.697v7.104l5.803-3.558L0 4.697ZM6.761 8.83l-6.57 4.027A2 2 0 0 0 2 14h12a2 2 0 0 0 1.808-1.144l-6.57-4.027L8 9.586l-1.239-.757Zm3.436-.586L16 11.801V4.697l-5.803 3.546Z"/>
                         </svg>
-                        t.m.harris@lse.ac.uk
+                        <span class="__cf_email__" data-cfemail="8df9a3e0a3e5ecffffe4fecde1fee8a3eceea3f8e6">[email&#160;protected]</span>
                     </a>
                     <a href="https://github.com/tom-harris-MIT" target="_blank">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
@@ -220,13 +233,4 @@
                         </svg>
                         LinkedIn
                     </a>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <footer>
-        © 2025 Tom Harris
-    </footer>
-</body>
-</html>
+       

@@ -251,6 +251,12 @@
             margin-bottom: 0.5rem;
         }
 
+        .wip-description {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
         /* Footer */
         footer {
             max-width: 900px;
@@ -267,6 +273,10 @@
             .nav-links {
                 gap: 1.25rem;
             }
+
+            .paper-image {
+                max-width: 100%;
+            }
         }
     </style>
 </head>
@@ -278,6 +288,7 @@
                 <a href="index.html">Home</a>
                 <a href="research.html" class="active">Research</a>
                 <a href="cv.pdf">CV</a>
+                <a href="more.html">More</a>
             </div>
         </div>
     </nav>
@@ -328,7 +339,12 @@
 
         <div class="paper">
             <div class="wip-title">Who Responds to Climate Risk? Disasters, Insurance Prices, and the Sorting of Migrants by Income</div>
-            <img src="us_mig_map.png" alt="US Migration Map" class="paper-image">
+            <p class="wip-description">
+                Examining whether Americans migrate away from climate-risky areas and how insurance pricing affects these patterns, using IRS county-to-county migration data combined with FEMA risk indices.
+            </p>
+            <div class="paper-links">
+                <a href="https://5kylng-tom-harris.shinyapps.io/US-Internal-Migration/" target="_blank">Interactive Migration Explorer</a>
+            </div>
         </div>
 
     </main>
