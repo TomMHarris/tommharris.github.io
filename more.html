@@ -20,7 +20,7 @@
         body {
             font-family: 'Source Sans 3', -apple-system, BlinkMacSystemFont, sans-serif;
             font-size: 17px;
-            line-height: 1.65;
+            line-height: 1.6;
             color: var(--text-primary);
             -webkit-font-smoothing: antialiased;
         }
@@ -31,11 +31,11 @@
         nav {
             border-bottom: 1px solid var(--border);
             padding: 1rem 0;
-            margin-bottom: 2rem;
+            margin-bottom: 3rem;
         }
 
         .nav-container {
-            max-width: 900px;
+            max-width: 800px;
             margin: 0 auto;
             padding: 0 1.5rem;
             display: flex;
@@ -47,47 +47,67 @@
             font-size: 1.25rem;
             font-weight: 600;
             color: var(--text-primary);
-            text-decoration: none;
         }
 
         .nav-links { display: flex; gap: 2rem; }
         .nav-links a { color: var(--text-secondary); }
-        .nav-links a:hover, .nav-links a.active { color: var(--accent); text-decoration: none; }
+        .nav-links a:hover, .nav-links a.active { color: var(--accent); }
 
         main {
-            max-width: 900px;
+            max-width: 800px;
             margin: 0 auto;
             padding: 0 1.5rem 4rem;
         }
 
         h2 {
-            font-size: 1.5rem;
+            font-size: 1.1rem;
             font-weight: 600;
             margin-bottom: 1.5rem;
+            color: var(--text-primary);
         }
 
-        .links-list {
-            display: flex;
-            flex-direction: column;
-            gap: 0.6rem;
+        .project-list {
+            display: grid;
+            gap: 2rem;
+            margin-bottom: 3rem;
         }
 
-        .links-list a {
+        .project-item {
+            display: block;
+        }
+
+        .project-title {
+            font-weight: 600;
+            display: block;
             font-size: 1.05rem;
         }
 
+        .project-desc {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            display: block;
+        }
+
+        hr {
+            border: 0;
+            border-top: 1px solid var(--border);
+            margin: 2rem 0;
+        }
+
+        .photo-link {
+            font-size: 1.05rem;
+            display: inline-flex;
+            align-items: center;
+        }
+
         footer {
-            max-width: 900px;
+            max-width: 800px;
             margin: 0 auto;
             padding: 2rem 1.5rem;
             border-top: 1px solid var(--border);
             font-size: 0.85rem;
             color: var(--text-secondary);
             text-align: center;
-        }
-
-        @media (max-width: 600px) {
-            .nav-links { gap: 1.25rem; }
         }
     </style>
 </head>
@@ -105,14 +125,28 @@
     </nav>
 
     <main>
-        <h2>Other things</h2>
+        <h2>Selected Projects</h2>
+        
+        <div class="project-list">
+            <div class="project-item">
+                <a href="https://mars-missions-viz.vercel.app/" target="_blank" class="project-title">Visualizing Mars Missions</a>
+                <span class="project-desc">Interactive data exploration of historical and planned missions to Mars.</span>
+            </div>
 
-        <div class="links-list">
-            <a href="https://corpus-ruby.vercel.app/" target="_blank">A Semantic Map of a Large Language Model</a>
-            <a href="https://geo-llm-three.vercel.app/" target="_blank">Benchmarking LLMs on GeoGuessr</a>
-            <a href="https://rpubs.com/tom__harris" target="_blank">Misc. Maps and Plots</a>
-            <a href="photos.html">Pictures I've taken</a>
+            <div class="project-item">
+                <a href="https://corpus-ruby.vercel.app/" target="_blank" class="project-title">A Semantic Map of a Large Language Model</a>
+                <span class="project-desc">Visualizing high-dimensional embeddings and linguistic relationships.</span>
+            </div>
+
+            <div class="project-item">
+                <a href="https://geo-llm-three.vercel.app/" target="_blank" class="project-title">Benchmarking LLMs on GeoGuessr</a>
+                <span class="project-desc">Evaluating spatial reasoning and geographical knowledge in AI models.</span>
+            </div>
         </div>
+
+        <hr>
+
+        <a href="photos.html" class="photo-link">Pictures I've taken &rarr;</a>
     </main>
 
     <footer>© 2026 Tom Harris</footer>
