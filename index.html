@@ -5,92 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tom Harris</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
     <style>
-        :root {
-            --text-primary: #212529;
-            --text-secondary: #6c757d;
-            --accent: #0076df;
-            --accent-hover: #0056b3;
-            --bg: #ffffff;
-            --border: #dee2e6;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Source Sans 3', -apple-system, BlinkMacSystemFont, sans-serif;
-            font-size: 17px;
-            line-height: 1.65;
-            color: var(--text-primary);
-            background: var(--bg);
-            -webkit-font-smoothing: antialiased;
-        }
-
-        a {
-            color: var(--accent);
-            text-decoration: none;
-        }
-
-        a:hover {
-            text-decoration: underline;
-        }
-
-        /* Navigation */
-        nav {
-            border-bottom: 1px solid var(--border);
-            padding: 1rem 0;
-            margin-bottom: 2.5rem;
-        }
-
-        .nav-container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 0 1.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .nav-name {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            text-decoration: none;
-        }
-
-        .nav-name:hover {
-            text-decoration: none;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-        }
-
-        .nav-links a {
-            color: var(--text-secondary);
-            font-weight: 400;
-        }
-
-        .nav-links a:hover,
-        .nav-links a.active {
-            color: var(--accent);
-            text-decoration: none;
-        }
-
-        /* Main */
-        main {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 0 1.5rem 4rem;
-        }
 
         /* About Section */
         .about {
@@ -100,27 +16,25 @@
         }
 
         .about-photo {
-            width: 300px;
-            height: 300px;
+            width: 280px;
+            height: 280px;
             object-fit: cover;
             flex-shrink: 0;
-            border-radius: 4px;
         }
 
         .about-content h1 {
-            font-size: 1.75rem;
-            font-weight: 600;
-            margin-bottom: 1.25rem;
+            font-family: var(--serif);
+            font-size: 2rem;
+            font-weight: 300;
+            letter-spacing: -0.01em;
+            margin-bottom: 1.5rem;
         }
 
         .about-content p {
-            color: var(--text-secondary);
+            color: var(--text-body);
             margin-bottom: 1rem;
         }
 
-        .about-content p a {
-            color: var(--accent);
-        }
 
         .about-content p:last-of-type {
             margin-bottom: 0;
@@ -136,23 +50,13 @@
             align-items: center;
             gap: 0.4rem;
             margin-right: 1.5rem;
-            color: var(--text-secondary);
-        }
-
-        .contact-info a:hover {
-            color: var(--accent);
+            color: var(--text-dim);
             text-decoration: none;
         }
 
-        /* Footer */
-        footer {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 2rem 1.5rem;
-            border-top: 1px solid var(--border);
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            text-align: center;
+        .contact-info a:hover {
+            color: var(--text);
+            text-decoration: none;
         }
 
         /* Responsive */

@@ -5,106 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Research | Tom Harris</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
     <style>
-        :root {
-            --text-primary: #212529;
-            --text-secondary: #6c757d;
-            --accent: #0076df;
-            --accent-hover: #0056b3;
-            --bg: #ffffff;
-            --border: #dee2e6;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Source Sans 3', -apple-system, BlinkMacSystemFont, sans-serif;
-            font-size: 17px;
-            line-height: 1.65;
-            color: var(--text-primary);
-            background: var(--bg);
-            -webkit-font-smoothing: antialiased;
-        }
-
-        a {
-            color: var(--accent);
-            text-decoration: none;
-        }
-
-        a:hover {
-            text-decoration: underline;
-        }
-
-        /* Navigation */
-        nav {
-            border-bottom: 1px solid var(--border);
-            padding: 1rem 0;
-            margin-bottom: 2rem;
-        }
-
-        .nav-container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 0 1.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .nav-name {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            text-decoration: none;
-        }
-
-        .nav-name:hover {
-            text-decoration: none;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-        }
-
-        .nav-links a {
-            color: var(--text-secondary);
-            font-weight: 400;
-        }
-
-        .nav-links a:hover,
-        .nav-links a.active {
-            color: var(--accent);
-            text-decoration: none;
-        }
-
-        /* Main */
-        main {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 0 1.5rem 4rem;
-        }
 
         h1 {
-            font-size: 1.75rem;
-            font-weight: 600;
-            margin-bottom: 2rem;
+            font-family: var(--serif);
+            font-size: 2rem;
+            font-weight: 300;
+            letter-spacing: -0.01em;
+            margin-bottom: 2.5rem;
         }
 
         /* Section Headers */
         h2 {
-            font-size: 1.35rem;
+            font-size: 0.78rem;
             font-weight: 600;
-            margin: 2.5rem 0 1.5rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px solid var(--border);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-dim);
+            margin: 3.5rem 0 1.75rem;
+            padding-bottom: 0.6rem;
+            border-bottom: 1px solid var(--rule-soft);
         }
 
         h2:first-of-type {
@@ -118,15 +39,13 @@
 
         .paper-badge {
             display: inline-block;
-            font-size: 0.75rem;
+            font-size: 0.68rem;
             font-weight: 600;
-            color: white;
-            background: #6c757d;
-            padding: 0.15rem 0.5rem;
-            border-radius: 3px;
-            margin-bottom: 0.5rem;
+            color: var(--text-dim);
+            padding: 0;
+            margin-bottom: 0.45rem;
             text-transform: uppercase;
-            letter-spacing: 0.03em;
+            letter-spacing: 0.12em;
         }
 
         .paper-title {
@@ -149,9 +68,10 @@
         }
 
         .paper-authors .expand-authors {
-            color: var(--accent);
+            color: var(--text);
             cursor: pointer;
             font-weight: 500;
+            border-bottom: 1px solid var(--rule);
         }
 
         .paper-authors .expand-authors:hover {
@@ -181,16 +101,16 @@
 
         .paper-links a {
             font-size: 0.85rem;
-            padding: 0.25rem 0.6rem;
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            color: var(--text-secondary);
-            transition: all 0.15s ease;
+            padding: 0.25rem 0.65rem;
+            border: 1px solid var(--rule);
+            color: var(--text-dim);
+            text-decoration: none;
+            transition: border-color 0.15s ease, color 0.15s ease;
         }
 
         .paper-links a:hover {
-            border-color: var(--accent);
-            color: var(--accent);
+            border-color: var(--text);
+            color: var(--text);
             text-decoration: none;
         }
 
@@ -205,8 +125,9 @@
         }
 
         .paper-media a {
-            color: var(--text-secondary);
+            color: var(--text-dim);
             font-weight: 500;
+            text-decoration: none;
             /* Padding gives the FT hover chip room; the negative margin cancels
                it so resting text position is unchanged. */
             padding: 0.1rem 0.3rem;
@@ -229,8 +150,8 @@
 
         .paper-image {
             max-width: 70%;
-            margin-top: 1rem;
-            border: 1px solid var(--border);
+            margin-top: 1.25rem;
+            border: 1px solid var(--rule-soft);
         }
 
         /* Abstract */
@@ -241,17 +162,17 @@
         details summary {
             cursor: pointer;
             font-size: 0.85rem;
-            color: var(--accent);
+            color: var(--text-dim);
             font-weight: 500;
-            padding: 0.25rem 0.6rem;
-            border: 1px solid var(--border);
-            border-radius: 4px;
+            padding: 0.25rem 0.65rem;
+            border: 1px solid var(--rule);
             display: inline-block;
-            transition: all 0.15s ease;
+            transition: border-color 0.15s ease, color 0.15s ease;
         }
 
         details summary:hover {
-            border-color: var(--accent);
+            border-color: var(--text);
+            color: var(--text);
         }
 
         details[open] summary {
@@ -260,7 +181,7 @@
 
         .abstract-text {
             font-size: 0.95rem;
-            color: var(--text-secondary);
+            color: var(--text-body);
             line-height: 1.6;
             padding-left: 0.5rem;
             border-left: 2px solid var(--border);
@@ -277,19 +198,8 @@
 
         .wip-description {
             font-size: 0.95rem;
-            color: var(--text-secondary);
+            color: var(--text-body);
             margin-bottom: 0.5rem;
-        }
-
-        /* Footer */
-        footer {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 2rem 1.5rem;
-            border-top: 1px solid var(--border);
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            text-align: center;
         }
 
         /* Responsive */

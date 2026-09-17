@@ -5,66 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>More | Tom Harris</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
     <style>
-        :root {
-            --text-primary: #212529;
-            --text-secondary: #6c757d;
-            --accent: #0076df;
-            --border: #dee2e6;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body {
-            font-family: 'Source Sans 3', -apple-system, BlinkMacSystemFont, sans-serif;
-            font-size: 17px;
-            line-height: 1.6;
-            color: var(--text-primary);
-            -webkit-font-smoothing: antialiased;
-        }
-
-        a { color: var(--accent); text-decoration: none; }
-        a:hover { text-decoration: underline; }
-
-        nav {
-            border-bottom: 1px solid var(--border);
-            padding: 1rem 0;
-            margin-bottom: 3rem;
-        }
-
-        .nav-container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 0 1.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .nav-name {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .nav-links { display: flex; gap: 2rem; }
-        .nav-links a { color: var(--text-secondary); }
-        .nav-links a:hover, .nav-links a.active { color: var(--accent); }
-
-        main {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 0 1.5rem 4rem;
-        }
 
         h2 {
-            font-size: 1.1rem;
+            font-size: 0.78rem;
             font-weight: 600;
-            margin-bottom: 1.5rem;
-            color: var(--text-primary);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-dim);
+            margin-bottom: 1.75rem;
         }
 
         .toggle-btn {
@@ -83,8 +33,11 @@
         .toggle-indicator {
             display: inline-block;
             transition: transform 0.18s ease;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             line-height: 1;
+            position: relative;
+            top: -1px;
+            opacity: 0.55;
         }
 
         .project-list.collapsed { display: none; }
@@ -104,35 +57,44 @@
             font-weight: 600;
             display: block;
             font-size: 1.05rem;
+            text-decoration: none;
         }
 
+        .project-title:hover { text-decoration: underline; text-decoration-color: var(--text); }
+
         .project-desc {
-            color: var(--text-secondary);
+            color: var(--text-body);
             font-size: 0.95rem;
             display: block;
         }
 
         hr {
             border: 0;
-            border-top: 1px solid var(--border);
-            margin: 2rem 0;
+            border-top: 1px solid var(--rule-soft);
+            margin: 3.5rem 0 3rem;
         }
 
-        .photo-link {
-            font-size: 1.05rem;
-            display: inline-flex;
-            align-items: center;
+        /* Photo collage -- two balanced columns, images at their own aspect ratio */
+        .photo-collage {
+            columns: 2;
+            column-gap: 0.75rem;
+            margin-bottom: 3rem;
         }
 
-        footer {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 2rem 1.5rem;
-            border-top: 1px solid var(--border);
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            text-align: center;
+        .photo-collage.collapsed { display: none; }
+
+        .photo-collage img {
+            width: 100%;
+            height: auto;
+            display: block;
+            margin-bottom: 0.75rem;
+            background: #f1f3f5;
         }
+
+        @media (max-width: 600px) {
+            .photo-collage { columns: 1; }
+        }
+
     </style>
 </head>
 <body>
@@ -187,19 +149,96 @@
 
         <hr>
 
-        <a href="photos.html" class="photo-link">Pictures I've taken &rarr;</a>
+        <h2>
+            <button id="toggle-photos" class="toggle-btn" aria-expanded="true">Photos <span class="toggle-indicator">&#9662;</span></button>
+        </h2>
+
+        <div class="photo-collage">
+                <img src="photos/selected/01-vancouver-lions-gate-fog.jpg" alt="vancouver lions gate fog" width="1600" height="1061" loading="lazy" decoding="async">
+                <img src="photos/selected/02-boston-downtown-looking-up.jpg" alt="boston downtown looking up" width="1061" height="1600" loading="lazy" decoding="async">
+                <img src="photos/selected/03-whistler-snowy-range-cloud.jpg" alt="whistler snowy range cloud" width="1600" height="1061" loading="lazy" decoding="async">
+                <img src="photos/selected/04-istanbul-blue-mosque-domes.jpg" alt="istanbul blue mosque domes" width="589" height="889" loading="lazy" decoding="async">
+                <img src="photos/selected/05-nyc-midtown-rooftop-golden.jpg" alt="nyc midtown rooftop golden" width="1600" height="1061" loading="lazy" decoding="async">
+                <img src="photos/selected/06-summit-fog-two-walkers.jpg" alt="summit fog two walkers" width="1200" height="1600" loading="lazy" decoding="async">
+                <img src="photos/selected/07-rime-ice-ridge-wide.jpg" alt="rime ice ridge wide" width="1600" height="900" loading="lazy" decoding="async">
+                <img src="photos/selected/08-perito-moreno-red-flowers.jpg" alt="perito moreno red flowers" width="1600" height="900" loading="lazy" decoding="async">
+                <img src="photos/selected/09-whale-tail-open-water.jpg" alt="whale tail open water" width="900" height="1600" loading="lazy" decoding="async">
+                <img src="photos/selected/10-grand-canyon-sunset.jpg" alt="grand canyon sunset" width="1600" height="900" loading="lazy" decoding="async">
+                <img src="photos/selected/11-chamonix-valley-gondola-paraglider.jpg" alt="chamonix valley gondola paraglider" width="1600" height="1111" loading="lazy" decoding="async">
+                <img src="photos/selected/12-mit-stata-center.jpg" alt="mit stata center" width="900" height="1600" loading="lazy" decoding="async">
+                <img src="photos/selected/13-two-deer-shore-grass.jpg" alt="two deer shore grass" width="1545" height="1024" loading="lazy" decoding="async">
+                <img src="photos/selected/14-cloud-inversion-sunrise-vertical.jpg" alt="cloud inversion sunrise vertical" width="900" height="1600" loading="lazy" decoding="async">
+                <img src="photos/selected/15-green-field-alpine-range.jpg" alt="green field alpine range" width="1600" height="900" loading="lazy" decoding="async">
+                <img src="photos/selected/16-altiplano-lagoon-volcano.jpg" alt="altiplano lagoon volcano" width="1600" height="900" loading="lazy" decoding="async">
+                <img src="photos/selected/17-coolidge-corner-neon-night.jpg" alt="coolidge corner neon night" width="900" height="1600" loading="lazy" decoding="async">
+                <img src="photos/selected/18-penitentes-ice-field-range.jpg" alt="penitentes ice field range" width="1600" height="900" loading="lazy" decoding="async">
+                <img src="photos/selected/19-chamonix-street-mont-blanc.jpg" alt="chamonix street mont blanc" width="900" height="1600" loading="lazy" decoding="async">
+                <img src="photos/selected/20-limestone-peak-above-cloud.jpg" alt="limestone peak above cloud" width="1600" height="900" loading="lazy" decoding="async">
+                <img src="photos/selected/21-river-skiff-fisherman-mist.jpg" alt="river skiff fisherman mist" width="900" height="1600" loading="lazy" decoding="async">
+                <img src="photos/selected/22-estuary-sun-through-cloud.jpg" alt="estuary sun through cloud" width="1600" height="1061" loading="lazy" decoding="async">
+                <img src="photos/selected/23-funicular-red-alpine-dusk.jpg" alt="funicular red alpine dusk" width="1600" height="900" loading="lazy" decoding="async">
+                <img src="photos/selected/24-nyc-triborough-skyline-window-dusk.jpg" alt="nyc triborough skyline window dusk" width="900" height="1600" loading="lazy" decoding="async">
+                <img src="photos/selected/25-limestone-cirque-cloud-plateau.jpg" alt="limestone cirque cloud plateau" width="1600" height="900" loading="lazy" decoding="async">
+                <img src="photos/selected/26-boston-back-bay-blue-hour-pier.jpg" alt="boston back bay blue hour pier" width="1600" height="862" loading="lazy" decoding="async">
+                <img src="photos/selected/27-rime-ice-ridge-vertical.jpg" alt="rime ice ridge vertical" width="900" height="1600" loading="lazy" decoding="async">
+                <img src="photos/selected/28-vancouver-lions-gate-fog-digital.jpg" alt="vancouver lions gate fog digital" width="1600" height="900" loading="lazy" decoding="async">
+                <img src="photos/selected/29-chamois-silhouette-cliff.jpg" alt="chamois silhouette cliff" width="1200" height="1600" loading="lazy" decoding="async">
+                <img src="photos/selected/30-istanbul-hagia-sophia-crowd.jpg" alt="istanbul hagia sophia crowd" width="889" height="589" loading="lazy" decoding="async">
+                <img src="photos/selected/31-glacier-basin-peaks.jpg" alt="glacier basin peaks" width="1600" height="900" loading="lazy" decoding="async">
+                <img src="photos/selected/32-sf-church-7up-sign.jpg" alt="sf church 7up sign" width="900" height="1600" loading="lazy" decoding="async">
+                <img src="photos/selected/33-salar-single-cactus.jpg" alt="salar single cactus" width="1600" height="900" loading="lazy" decoding="async">
+                <img src="photos/selected/34-patagonia-glacier-lake-grey.jpg" alt="patagonia glacier lake grey" width="1600" height="900" loading="lazy" decoding="async">
+                <img src="photos/selected/35-snow-road-dusk-ridge.jpg" alt="snow road dusk ridge" width="900" height="1600" loading="lazy" decoding="async">
+                <img src="photos/selected/36-nyc-brooklyn-bridge-dusk.jpg" alt="nyc brooklyn bridge dusk" width="1600" height="1061" loading="lazy" decoding="async">
+                <img src="photos/selected/37-tv-tower-cloud-hillside.jpg" alt="tv tower cloud hillside" width="1600" height="900" loading="lazy" decoding="async">
+                <img src="photos/selected/38-beach-dusk-figures-wet-sand.jpg" alt="beach dusk figures wet sand" width="900" height="1600" loading="lazy" decoding="async">
+                <img src="photos/selected/39-glacier-rock-spur-cloud.jpg" alt="glacier rock spur cloud" width="1600" height="900" loading="lazy" decoding="async">
+                <img src="photos/selected/40-laguna-colorada-flamingos.jpg" alt="laguna colorada flamingos" width="1600" height="900" loading="lazy" decoding="async">
+                <img src="photos/selected/41-dune-crest-ridge.jpg" alt="dune crest ridge" width="900" height="1600" loading="lazy" decoding="async">
+                <img src="photos/selected/42-cloud-forest-canopy.jpg" alt="cloud forest canopy" width="1600" height="900" loading="lazy" decoding="async">
+                <img src="photos/selected/43-fitz-roy-forest.jpg" alt="fitz roy forest" width="900" height="1600" loading="lazy" decoding="async">
+                <img src="photos/selected/44-turquoise-lagoon-shore-plane.jpg" alt="turquoise lagoon shore plane" width="1545" height="1024" loading="lazy" decoding="async">
+                <img src="photos/selected/45-beach-sunrise-birds.jpg" alt="beach sunrise birds" width="900" height="1600" loading="lazy" decoding="async">
+                <img src="photos/selected/46-cable-car-night-valley-lights.jpg" alt="cable car night valley lights" width="1600" height="900" loading="lazy" decoding="async">
+                <img src="photos/selected/47-sf-golden-gate-bridge-fisheye.jpg" alt="sf golden gate bridge fisheye" width="1060" height="1600" loading="lazy" decoding="async">
+                <img src="photos/selected/48-cloud-over-green-pass-path.jpg" alt="cloud over green pass path" width="836" height="627" loading="lazy" decoding="async">
+                <img src="photos/selected/49-nyc-steam-stack-empire-state-night.jpg" alt="nyc steam stack empire state night" width="900" height="1600" loading="lazy" decoding="async">
+                <img src="photos/selected/50-ski-slope-tracks-wide.jpg" alt="ski slope tracks wide" width="1600" height="1061" loading="lazy" decoding="async">
+                <img src="photos/selected/51-mit-dome-night.jpg" alt="mit dome night" width="900" height="1600" loading="lazy" decoding="async">
+                <img src="photos/selected/52-ridge-cows-valley-haze.jpg" alt="ridge cows valley haze" width="1600" height="900" loading="lazy" decoding="async">
+                <img src="photos/selected/53-salar-cacti-island-dusk.jpg" alt="salar cacti island dusk" width="1600" height="900" loading="lazy" decoding="async">
+                <img src="photos/selected/54-glacier-climber-resting.jpg" alt="glacier climber resting" width="900" height="1600" loading="lazy" decoding="async">
+                <img src="photos/selected/55-patagonia-lakes-storm-light.jpg" alt="patagonia lakes storm light" width="1600" height="900" loading="lazy" decoding="async">
+                <img src="photos/selected/56-beach-forest-driftwood-curve.jpg" alt="beach forest driftwood curve" width="1600" height="900" loading="lazy" decoding="async">
+                <img src="photos/selected/57-causeway-whiteout-snow.jpg" alt="causeway whiteout snow" width="900" height="1600" loading="lazy" decoding="async">
+                <img src="photos/selected/58-alpine-valley-gondola-yellow.jpg" alt="alpine valley gondola yellow" width="1600" height="900" loading="lazy" decoding="async">
+                <img src="photos/selected/59-andes-snow-peak-dark-valley.jpg" alt="andes snow peak dark valley" width="1600" height="900" loading="lazy" decoding="async">
+                <img src="photos/selected/60-yosemite-half-dome-dead-pines.jpg" alt="yosemite half dome dead pines" width="900" height="1600" loading="lazy" decoding="async">
+                <img src="photos/selected/61-boston-rooftops-skyline-storm.jpg" alt="boston rooftops skyline storm" width="1600" height="900" loading="lazy" decoding="async">
+                <img src="photos/selected/62-snow-boulder-two-figures.jpg" alt="snow boulder two figures" width="1600" height="1061" loading="lazy" decoding="async">
+                <img src="photos/selected/63-vancouver-street-towers-fog.jpg" alt="vancouver street towers fog" width="900" height="1600" loading="lazy" decoding="async">
+                <img src="photos/selected/64-patagonia-road-steppe-peaks.jpg" alt="patagonia road steppe peaks" width="1600" height="900" loading="lazy" decoding="async">
+                <img src="photos/selected/65-limestone-crag-vertical.jpg" alt="limestone crag vertical" width="900" height="1600" loading="lazy" decoding="async">
+                <img src="photos/selected/66-gondola-above-pines-snow.jpg" alt="gondola above pines snow" width="1600" height="1061" loading="lazy" decoding="async">
+                <img src="photos/selected/67-train-blur-beach.jpg" alt="train blur beach" width="1600" height="900" loading="lazy" decoding="async">
+                <img src="photos/selected/68-lone-pine-shoreline.jpg" alt="lone pine shoreline" width="900" height="1600" loading="lazy" decoding="async">
+                <img src="photos/selected/69-london-parliament-thames-dusk.jpg" alt="london parliament thames dusk" width="1600" height="900" loading="lazy" decoding="async">
+                <img src="photos/selected/70-alpenglow-glaciated-massif.jpg" alt="alpenglow glaciated massif" width="1600" height="900" loading="lazy" decoding="async">
+        </div>
     </main>
 
     <footer>© 2026 Tom Harris</footer>
 
     <script>
     document.addEventListener('DOMContentLoaded', function () {
-        var btn = document.getElementById('toggle-projects');
-        var list = document.querySelector('.project-list');
-        if (!btn || !list) return;
-        btn.addEventListener('click', function () {
-            var collapsed = list.classList.toggle('collapsed');
-            btn.setAttribute('aria-expanded', String(!collapsed));
+        [['toggle-projects', '.project-list'], ['toggle-photos', '.photo-collage']].forEach(function (pair) {
+            var btn = document.getElementById(pair[0]);
+            var panel = document.querySelector(pair[1]);
+            if (!btn || !panel) return;
+            btn.addEventListener('click', function () {
+                var collapsed = panel.classList.toggle('collapsed');
+                btn.setAttribute('aria-expanded', String(!collapsed));
+            });
         });
     });
     </script>

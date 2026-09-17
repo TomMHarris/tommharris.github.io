@@ -21,3 +21,13 @@ package-lock.json
 
 # Ignore files created by MacOS
 .DS_Store
+
+# Photo originals (web-sized copies live in photos/gallery/)
+photos/tomm photos/
+
+# Working folder of every photo, renamed for review (not part of the site)
+photos/all-named/
+
+# Loose source uploads (web copies live in photos/selected/)
+photos/*.jpg
+!photos/selected/
