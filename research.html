@@ -154,6 +154,21 @@
             border: 1px solid var(--rule-soft);
         }
 
+        /* An image that links out to its interactive version: no underline,
+           and the border firms up on hover to signal it is clickable. */
+        .paper-image-link {
+            display: block;
+            text-decoration: none;
+        }
+
+        .paper-image-link .paper-image {
+            transition: border-color 0.15s ease;
+        }
+
+        .paper-image-link:hover .paper-image {
+            border-color: var(--text);
+        }
+
         /* Abstract */
         details {
             display: inline;
@@ -292,6 +307,9 @@
                 <a href="ai_task_value.pdf" target="_blank">Draft</a>
                 <a href="https://aitasks-ecru.vercel.app/" target="_blank">Interactive Visualisation</a>
             </div>
+            <a href="https://aitasks-ecru.vercel.app/" target="_blank" class="paper-image-link">
+                <img src="ai_task_horizon.png" alt="Radial chart of O*NET tasks by human duration and occupation group, relative to METR's 50% and 80% time-horizon frontiers" class="paper-image" style="max-width: 60%;">
+            </a>
         </div>
 
         <div class="paper">
