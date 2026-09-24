@@ -1,6 +1,5 @@
 // A tiny moon-rover runner hiding at the bottom of this page. Scroll to the very
-// bottom and keep going, and a rover drives in; click it to play. (Or tap the
-// space bar five times in a row.)
+// bottom and keep going, and a rover drives in; click it to play.
 // Space / up to jump (hold for higher), down to duck, esc to put it back to sleep.
 // On a touch screen: tap the right side to jump, hold the left side to duck.
 (function () {
@@ -645,8 +644,6 @@
 
     var JUMP_KEYS = { Space: 1, ArrowUp: 1, KeyW: 1 }, DUCK_KEYS = { ArrowDown: 1, KeyS: 1 };
 
-    // five quick taps of the space bar
-    var taps = 0, lastTap = 0;
     window.addEventListener('keydown', function (e) {
         if (open) {
             if (e.code === 'Escape') { close(); return; }
@@ -661,20 +658,9 @@
             }
             return;
         }
-        if (e.code === 'ArrowDown' || e.code === 'PageDown' || e.code === 'End') nudge(60);
-        if (e.code !== 'Space' || e.repeat || e.metaKey || e.ctrlKey || e.altKey) return;
-        nudge(60);
-        var tag = e.target && e.target.tagName;
-        if (tag && /^(INPUT|TEXTAREA|SELECT)$/.test(tag)) return;
-        var now = performance.now();
-        if (now - lastTap > 1500) taps = 0;
-        taps++;
-        lastTap = now;
-        if (taps >= 5) {
-            taps = 0;
-            e.preventDefault();
-            summon();
-        }
+        // keys that scroll down count as a push past the bottom
+        if (e.metaKey || e.ctrlKey || e.altKey) return;
+        if (e.code === 'ArrowDown' || e.code === 'PageDown' || e.code === 'End' || e.code === 'Space') nudge(60);
     });
     window.addEventListener('keyup', function (e) {
         if (JUMP_KEYS[e.code]) jumpHeld = false;
@@ -688,7 +674,4 @@
                       : '␣ to jump (hold for higher) · ↓ to duck · esc to sleep';
     };
 
-    try {
-        console.log('%c␣ ␣ ␣ ␣ ␣', 'color:#adb5bd;font-family:Menlo,monospace;font-size:11px');
-    } catch (e) { /* ignore */ }
 })();
