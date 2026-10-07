@@ -1144,14 +1144,14 @@
 
     if (!reduced) {
         // Evening comes after ten seconds here, over another ten. If it already
-        // came on an earlier visit this session, it comes back sooner.
+        // came on an earlier visit this session, it falls a little faster.
         var fell = false;
         try { fell = !!sessionStorage.getItem('night-fell'); } catch (e) { /* ignore */ }
         if (PREVIEW) {
             duskAt = 0;
             duskLen = 1500;
         } else if (fell) {
-            duskAt = 3000;
+            duskAt = 10000;
             duskLen = 6000;
         } else {
             duskAt = 10000;
