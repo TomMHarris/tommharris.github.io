@@ -1,10 +1,10 @@
-// Stay on this page a little while and evening comes. The page fades into a
-// muted blue dusk with the last warmth of the sunset along the bottom, and a
-// few stars come out. The moon shows its real phase for today, and the
-// constellations appear on hover. A fast sweep of the cursor throws a comet.
-// Once it's properly dark, the starlings come in for a murmuration before
-// they settle for the night.
-// Console: night(), day(), comet(), shower(), starlings(), sky.speed(n).
+// Stay on this page a little while and evening comes. As the light starts to
+// go, the starlings come in for a murmuration over the sunset, then drop down
+// to roost. Once they've settled, the page fades on into a muted blue dusk
+// with the last warmth along the bottom, and a few stars come out. The moon
+// shows its real phase for today, the constellations appear on hover, and
+// once in a while a star falls.
+// Console: night(), day(), starlings(), sky.speed(n).
 (function () {
     'use strict';
 
@@ -75,30 +75,6 @@
         c.closePath();
     }
 
-    // ---- meteor showers, on their real dates ----
-    // name, month (0-based), peak day, where along the top the radiant sits
-    var SHOWERS = [
-        ['quadrantids', 0, 3, 0.64], ['lyrids', 3, 22, 0.30], ['eta aquariids', 4, 6, 0.78],
-        ['perseids', 7, 12, 0.70], ['orionids', 9, 21, 0.38], ['leonids', 10, 17, 0.56],
-        ['geminids', 11, 14, 0.34]
-    ];
-    var MONTHS = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
-    function showerNear(date, within) {
-        var best = null;
-        SHOWERS.forEach(function (s) {
-            for (var y = date.getFullYear() - 1; y <= date.getFullYear() + 1; y++) {
-                var days = (new Date(y, s[1], s[2]) - date) / 86400000;
-                if (within ? Math.abs(days) <= within : days >= -1) {
-                    if (!best || Math.abs(days) < Math.abs(best.days)) {
-                        best = { name: s[0], month: s[1], day: s[2], rx: s[3], days: days };
-                    }
-                }
-            }
-        });
-        return best;
-    }
-    var activeShower = showerNear(new Date(), 2.5);
-
     // ---- constellations (normalized boxes, y down; array order = priority) ----
     var CONSTELLATIONS = [
         {
@@ -136,15 +112,16 @@
     var zones = [], stars = [], consts = [], moon = null, skyFloor = 0;
     var built = false, narrow = false;              // narrow: a phone, with no margins to speak of
     var column = { l: 0, r: 0 };
-    var meteors = [], comets = [], sparks = [], samples = [], labels = [];
+    var meteors = [], labels = [];
     var mouse = { x: -1e4, y: -1e4 };
     var pm = { x: 0, y: 0 }, lens = 0;              // smoothed parallax + lensing
 
     var clock = 0, lastReal = 0, speedMul = 1, raf = null, running = false;
     var duskAt = Infinity, duskLen = 10000;
     var dusk = 0, duskRate = 0, duskBegun = false;
-    var nextShootAt = Infinity, burst = [], lastCometAt = -1e9;
+    var nextShootAt = Infinity;
     var flock = null, nextFlockAt = Infinity;
+    var SUNSET = 0.4;                       // how far dusk gets while the starlings are out: no stars yet
     var resizeTimer = null;
 
     function sizeCanvas() {
@@ -227,7 +204,7 @@
             var high = Math.pow(clamp01(1 - y / (vh * 0.85)), 0.6);   // fainter toward the horizon
             stars.push({
                 x: x, y: y, px: x, py: y,
-                r: 0.5 + mag * 1.3, depth: mag, boost: 0,
+                r: 0.5 + mag * 1.3, depth: mag,
                 base: (0.45 + mag * 0.5) * (inCol ? (narrow ? 0.7 : 0.45) : 1) * (0.35 + 0.65 * high),
                 period: 2500 + Math.random() * 4500,
                 ph: Math.random() * 6.28,
@@ -266,7 +243,7 @@
             }
             rects.push({ y0: y0, y1: y0 + h + 18 }); // body + name label
             consts.push({
-                name: def.name, lines: def.lines, hover: 0, ig: -1,
+                name: def.name, lines: def.lines, hover: 0,
                 cx: x0 + w / 2, cy: y0 + h / 2,
                 hoverR: Math.max(w, h) / 2 + 36,
                 labelY: y0 + h + 18,
@@ -274,7 +251,7 @@
                     var x = x0 + pt[0] * w, y = y0 + pt[1] * h;
                     var st = {
                         x: x, y: y, px: x, py: y,
-                        r: 1.3 + Math.random() * 0.4, depth: 0.8, boost: 0,
+                        r: 1.3 + Math.random() * 0.4, depth: 0.8,
                         base: 0.85 + Math.random() * 0.1,
                         period: 3500 + Math.random() * 4000,
                         ph: Math.random() * 6.28,
@@ -356,20 +333,8 @@
         }
     }
 
-    function igniteAlpha(c, now) {
-        if (c.ig < 0) return 0;
-        var age = now - c.ig;
-        if (age > 4000) { c.ig = -1; return 0; }
-        return age < 3200 ? 1 : 1 - (age - 3200) / 800;
-    }
-
     function drawStars(now) {
         var j, k, c;
-        for (j = 0; j < consts.length; j++) {
-            c = consts[j];
-            c.igA = igniteAlpha(c, now);
-            for (k = 0; k < c.stars.length; k++) c.stars[k].boost = c.igA * 0.4;
-        }
         placeStars(reduced ? 0 : clamp01((dusk - 0.6) / 0.4));
 
         for (var i = 0; i < stars.length; i++) {
@@ -377,7 +342,7 @@
             var ap = reduced ? 1 : clamp01((dusk - s.appear) / 0.1);
             if (ap <= 0) continue;
             var tw = reduced ? 1 : 0.78 + 0.22 * Math.sin(now * 2 * Math.PI / s.period + s.ph);
-            var a = Math.min(1, s.base * ap * tw * (1 + (s.boost || 0)));
+            var a = Math.min(1, s.base * ap * tw);
             if (s.r > 1.2) {
                 var g = ctx.createRadialGradient(s.px, s.py, 0, s.px, s.py, s.r * 4);
                 g.addColorStop(0, rgba(WHITE, a * 0.45));
@@ -391,28 +356,23 @@
             ctx.fill();
         }
 
-        // constellation lines, on hover (or when a comet lights them)
+        // constellation lines, on hover
         for (j = 0; j < consts.length; j++) {
             c = consts[j];
             var dx = mouse.x - c.cx, dy = mouse.y - c.cy;
             var target = (Math.sqrt(dx * dx + dy * dy) < c.hoverR && dusk > 0.8) ? 1 : 0;
             c.hover += (target - c.hover) * (reduced ? 1 : 0.08);
-            var la = Math.max(c.hover * 0.8, c.igA * 0.9);
-            if (la < 0.004) continue;
-            var age = c.ig >= 0 ? now - c.ig : 1e9;
-            ctx.strokeStyle = rgba(WHITE, la);
+            if (c.hover < 0.005) continue;
+            ctx.strokeStyle = rgba(WHITE, c.hover * 0.8);
             ctx.lineWidth = 0.9;
             ctx.beginPath();
             for (k = 0; k < c.lines.length; k++) {
-                var prog = c.hover > 0.5 ? 1 : clamp01((age - k * 110) / 160);
-                if (prog <= 0) continue;
                 var a1 = c.stars[c.lines[k][0]], a2 = c.stars[c.lines[k][1]];
                 ctx.moveTo(a1.px, a1.py);
-                ctx.lineTo(a1.px + (a2.px - a1.px) * prog, a1.py + (a2.py - a1.py) * prog);
+                ctx.lineTo(a2.px, a2.py);
             }
             ctx.stroke();
-            var na = Math.max(c.hover, c.igA * clamp01((age - 500) / 400)) * 0.75;
-            if (na > 0.004) labels.push([c.name, c.cx, c.labelY, na]);
+            labels.push([c.name, c.cx, c.labelY, c.hover * 0.75]);
         }
     }
 
@@ -445,39 +405,26 @@
         }
     }
 
-    // ---- falling stars ----
-    function spawnMeteor(sh) {
-        var now = performance.now();
-        if (sh) {
-            // a shower: every streak points back to the same radiant
-            var rx = vw * sh.rx, ry = -30;
-            var ang = Math.PI / 2 + (Math.random() - 0.5) * 1.6;
-            var d0 = 60 + Math.random() * vh * 0.45, len = 130 + Math.random() * 150;
-            meteors.push({
-                x0: rx + Math.cos(ang) * d0, y0: ry + Math.sin(ang) * d0,
-                dx: Math.cos(ang) * len, dy: Math.sin(ang) * len,
-                t0: now, life: 480 + Math.random() * 300
-            });
-            return;
-        }
+    // ---- falling stars: one now and then, once night has fallen ----
+    function spawnMeteor() {
         meteors.push({
             x0: vw * (0.08 + Math.random() * 0.84),
             y0: 16 + Math.random() * 90,
             dx: (Math.random() < 0.5 ? -1 : 1) * (200 + Math.random() * 150),
             dy: 40 + Math.random() * 70,
-            t0: now,
+            t0: performance.now(),
             life: 600 + Math.random() * 250
         });
     }
 
     function drawMeteors(now) {
         for (var q = meteors.length - 1; q >= 0; q--) {
-            var sh = meteors[q];
-            var p = (now - sh.t0) / sh.life;
+            var m = meteors[q];
+            var p = (now - m.t0) / m.life;
             if (p >= 1) { meteors.splice(q, 1); continue; }
             var e = 1 - (1 - p) * (1 - p);
-            var hx = sh.x0 + sh.dx * e, hy = sh.y0 + sh.dy * e;
-            var tx = hx - sh.dx * 0.3, ty = hy - sh.dy * 0.3;
+            var hx = m.x0 + m.dx * e, hy = m.y0 + m.dy * e;
+            var tx = hx - m.dx * 0.3, ty = hy - m.dy * 0.3;
             var grad = ctx.createLinearGradient(tx, ty, hx, hy);
             grad.addColorStop(0, rgba(WHITE, 0));
             grad.addColorStop(1, rgba(WHITE, Math.sin(Math.PI * p) * 0.95));
@@ -490,171 +437,7 @@
         }
     }
 
-    // ---- comets: throw one with a fast sweep of the cursor, after dark ----
-    function cursorVel(now) {
-        var n = samples.length;
-        if (n < 2 || now - samples[n - 1].t > 40) return { x: 0, y: 0, s: 0 };
-        var first = samples[n - 1], last = samples[n - 1];
-        for (var i = n - 2; i >= 0 && last.t - samples[i].t <= 70; i--) first = samples[i];
-        var dt = last.t - first.t;
-        if (dt <= 0) return { x: 0, y: 0, s: 0 };
-        var vx = (last.x - first.x) / dt, vy = (last.y - first.y) / dt;
-        return { x: vx, y: vy, s: Math.hypot(vx, vy) };
-    }
-
-    function maybeLaunch(now, sideways) {
-        if (reduced || dusk < 0.6 || duskRate < 0 || now - lastCometAt < 1200) return;
-        for (var i = 0; i < comets.length; i++) if (comets[i].follow) return;
-        if (samples.length < 5) return;
-        var len = 0, first = null, last = samples[samples.length - 1];
-        for (i = 1; i < samples.length; i++) {
-            if (now - samples[i - 1].t > 300) continue;
-            if (!first) first = samples[i - 1];
-            len += Math.hypot(samples[i].x - samples[i - 1].x, samples[i].y - samples[i - 1].y);
-        }
-        if (len < (sideways ? Math.min(250, vw * 0.45) : 250)) return;
-        if (sideways && first && Math.abs(last.x - first.x) < 2 * Math.abs(last.y - first.y)) return;
-        lastCometAt = now;
-        var v = cursorVel(now);
-        comets.push({
-            x: mouse.x, y: mouse.y, vx: v.x, vy: v.y, tvx: v.x, tvy: v.y,
-            follow: true, born: now, slow: 0, emit: 0,
-            pts: samples.slice(-8).map(function (p) { return { x: p.x, y: p.y, t: p.t }; })
-        });
-        wake();
-    }
-
-    // A long, slow comet across the whole sky.
-    function launchScripted() {
-        var now = performance.now();
-        var fromLeft = Math.random() < 0.5;
-        var sp = 1.35 + Math.random() * 0.2, ang = (0.08 + Math.random() * 0.12) * (fromLeft ? 1 : -1);
-        comets.push({
-            x: fromLeft ? -20 : vw + 20, y: vh * (0.12 + Math.random() * 0.2),
-            vx: (fromLeft ? 1 : -1) * sp * Math.cos(ang), vy: sp * Math.abs(Math.sin(ang)),
-            follow: false, born: now, slow: 0, emit: 0, pts: [], life: 2400
-        });
-        wake();
-    }
-
-    function updateComets(now, dt) {
-        for (var q = comets.length - 1; q >= 0; q--) {
-            var c = comets[q];
-            if (c.follow) {
-                var v = cursorVel(now);
-                if (v.s > 0.45) { c.tvx = v.x; c.tvy = v.y; c.slow = 0; } else c.slow += dt;
-                var k = 1 - Math.exp(-dt / 30);
-                var nx = c.x + (mouse.x - c.x) * k, ny = c.y + (mouse.y - c.y) * k;
-                c.vx += ((nx - c.x) / Math.max(dt, 1) - c.vx) * 0.35;
-                c.vy += ((ny - c.y) / Math.max(dt, 1) - c.vy) * 0.35;
-                c.x = nx;
-                c.y = ny;
-                if (c.slow > 45 || now - c.born > 1800 || mouse.x < -1000) {
-                    // let go: it carries on the way you threw it
-                    c.follow = false;
-                    var ts = Math.hypot(c.tvx, c.tvy), cap = ts > 1.7 ? 1.7 / ts : 1;
-                    c.vx = c.tvx * cap;
-                    c.vy = c.tvy * cap;
-                }
-            } else {
-                var dec = Math.exp(-dt / (c.life ? c.life / 2 : 320));
-                c.x += c.vx * dt;
-                c.y += c.vy * dt;
-                c.vx *= dec;
-                c.vy *= dec;
-            }
-            c.pts.push({ x: c.x, y: c.y, t: now });
-            while (c.pts.length && now - c.pts[0].t > 240) c.pts.shift();
-            // and no tail longer than ~300px, however hard it was thrown
-            var tl = 0;
-            for (var pi = c.pts.length - 1; pi > 0; pi--) {
-                tl += Math.hypot(c.pts[pi].x - c.pts[pi - 1].x, c.pts[pi].y - c.pts[pi - 1].y);
-                if (tl > 300) { c.pts.splice(0, pi - 1); break; }
-            }
-
-            var speed = Math.hypot(c.vx, c.vy);
-            c.int = clamp01((now - c.born) / 120) * (c.follow ? 1 : clamp01(speed / 0.5));
-            if (!c.follow && (speed < 0.03 || c.x < -200 || c.x > vw + 200 || c.y < -200 || c.y > vh + 200)) {
-                comets.splice(q, 1);
-                continue;
-            }
-
-            // sparks shed along the way
-            if (speed > 0.3 && c.int > 0.3) {
-                c.emit = Math.min(3, c.emit + speed * dt * 0.05);
-                while (c.emit >= 1 && sparks.length < 150) {
-                    c.emit -= 1;
-                    sparks.push({
-                        x: c.x + (Math.random() - 0.5) * 3, y: c.y + (Math.random() - 0.5) * 3,
-                        vx: c.vx * 0.1 + (Math.random() - 0.5) * 0.09,
-                        vy: c.vy * 0.1 + (Math.random() - 0.5) * 0.09,
-                        t0: now, life: 600 + Math.random() * 300,
-                        r: 0.5 + Math.random() * 0.6, warm: Math.random() < 0.4
-                    });
-                }
-            }
-
-            // passing through a constellation lights it up
-            if (speed > 0.25) {
-                for (var j = 0; j < consts.length; j++) {
-                    var cs = consts[j];
-                    if (cs.ig < 0 && Math.hypot(c.x - cs.cx, c.y - cs.cy) < cs.hoverR * 0.75) cs.ig = now;
-                }
-            }
-        }
-
-        for (var s = sparks.length - 1; s >= 0; s--) {
-            var sp = sparks[s];
-            if (now - sp.t0 > sp.life) { sparks.splice(s, 1); continue; }
-            var sd = Math.exp(-dt / 400);
-            sp.x += sp.vx * dt;
-            sp.y += sp.vy * dt;
-            sp.vx *= sd;
-            sp.vy *= sd;
-        }
-    }
-
-    function drawComets(now) {
-        var i, p;
-        for (i = 0; i < sparks.length; i++) {
-            p = sparks[i];
-            var a = Math.pow(1 - (now - p.t0) / p.life, 1.5) * 0.8;
-            ctx.fillStyle = rgba(p.warm ? CLAY : WHITE, a);
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, p.r, 0, 6.2832);
-            ctx.fill();
-        }
-        ctx.lineCap = 'round';
-        for (var q = 0; q < comets.length; q++) {
-            var c = comets[q], pts = c.pts, n = pts.length;
-            if (!c.int) continue;
-            for (i = 1; i < n; i++) {
-                var u = i / (n - 1);
-                var m = Math.pow(clamp01((u - 0.5) / 0.5), 1.4);
-                ctx.strokeStyle = rgba(lerpC(WHITE, CLAY, m), 0.9 * Math.pow(u, 1.5) * c.int);
-                ctx.lineWidth = 0.4 + 2.4 * Math.pow(u, 1.6);
-                ctx.beginPath();
-                ctx.moveTo(pts[i - 1].x, pts[i - 1].y);
-                ctx.lineTo(pts[i].x, pts[i].y);
-                ctx.stroke();
-            }
-            var g = ctx.createRadialGradient(c.x, c.y, 0, c.x, c.y, 12);
-            g.addColorStop(0, rgba(CLAY, 0.35 * c.int));
-            g.addColorStop(1, rgba(CLAY, 0));
-            ctx.fillStyle = g;
-            ctx.beginPath();
-            ctx.arc(c.x, c.y, 12, 0, 6.2832);
-            ctx.fill();
-            ctx.fillStyle = rgba(WHITE, c.int);
-            ctx.beginPath();
-            ctx.arc(c.x, c.y, 1.8, 0, 6.2832);
-            ctx.fill();
-        }
-        ctx.lineCap = 'butt';
-    }
-
-
-    // ---- starlings: a murmuration at nightfall, before they go down to roost ----
+    // ---- starlings: a murmuration at sunset, before they go down to roost ----
     // A small agent-based flock after the StarDisplay model (Hildenbrandt,
     // Carere & Hemelrijk 2010). Each bird flies at its own cruise speed, banks
     // into turns it can't make too tightly, and steers by its seven nearest
@@ -666,12 +449,10 @@
     // rather than moving as one block. Now and then a few birds startle and the
     // turn runs through the flock as a wave. Nothing is scripted, so no two
     // evenings are alike. They stay fifteen seconds or so, then go down to roost.
-    // Point at the flock and it parts around you like it would round a falcon;
-    // some evenings a real one comes through.
+    // Point at the flock and it parts around you like it would round a falcon.
     var STARLINGS = true;                   // the experiment: false leaves them out
-    var BIRD = [44, 52, 66], FALCON = [34, 38, 48];
+    var BIRD = [44, 52, 66];
     var K = 7, CELL = 24, LOBES = 3;
-    var falconNext = false;                 // starlings() from the console always brings one
 
     function rnd(lo, hi) { return lo + Math.random() * (hi - lo); }
     function gauss() { return Math.sqrt(-2 * Math.log(1 - Math.random())) * Math.cos(6.2832 * Math.random()); }
@@ -688,10 +469,8 @@
             wa: rnd(1.6, 2.4), wc: rnd(1.0, 1.8), wg: rnd(60, 85),  // alignment, cohesion, roost pull
             wf: rnd(0.1, 0.14),                               // pull of the flock as a whole
             scale: narrow ? 1.1 : 1.35,
-            falcon: null, falconAt: falconNext || Math.random() < 0.5 ? rnd(3, 6) : Infinity,
             nextStartle: rnd(1.2, 2.5)
         };
-        falconNext = false;
         nextFlockAt = Infinity;                               // one flock at a time
         for (var i = 0; i < 8; i++) { f.ph.push(Math.random() * 6.28); f.fr.push(rnd(0.75, 1.35)); }
         // each part of the flock circles the roost its own way, some one way, some the other
@@ -872,19 +651,8 @@
 
     function updateFlock(now, sdt) {
         var f = flock, total = Math.min(0.05, sdt / 1000);
-        // a peregrine, some evenings: one fast stoop through the middle of them
-        if (!f.falcon && f.t > f.falconAt && f.t < f.roostAt - 1) {
-            var c = centroid(f), from = c.x > vw / 2 ? -1 : 1;  // from the open side of the sky
-            var sx = c.x + from * Math.min(vw * 0.35, 380), sy = -30;
-            var dx = c.x - sx, dy = c.y - sy, d = Math.sqrt(dx * dx + dy * dy);
-            f.falcon = { x: sx, y: sy, vx: dx / d * 420, vy: dy / d * 420, wing: 0, tx: c.x, ty: c.y, through: false };
-            f.falconAt = Infinity;
-        }
-
         var hunters = [];
         if (mouse.x > -1000 && lens > 0.3) hunters.push([mouse.x, mouse.y, 70]);
-        for (var c2 = 0; c2 < comets.length; c2++) if (comets[c2].int > 0.3) hunters.push([comets[c2].x, comets[c2].y, 90]);
-        if (f.falcon) hunters.push([f.falcon.x, f.falcon.y, 90]);
 
         // now and then a few birds near each other startle, and veer
         if (f.t > f.nextStartle && f.t < f.roostAt) {
@@ -905,14 +673,6 @@
             total -= dt;
             f.t += dt;
             live = stepFlock(f, dt, hunters);
-            if (f.falcon) {
-                var fc = f.falcon;
-                // straight through the middle of them, then pulling up and away
-                if (!fc.through && (fc.tx - fc.x) * fc.vx + (fc.ty - fc.y) * fc.vy < 0) fc.through = true;
-                if (fc.through) fc.vy -= 420 * dt;
-                fc.x += fc.vx * dt; fc.y += fc.vy * dt; fc.wing += 14 * dt;
-                if (fc.x < -60 || fc.x > vw + 60 || fc.y < -80 || fc.y > vh + 80) f.falcon = null;
-            }
         }
         if (!live) flock = null;
     }
@@ -973,20 +733,13 @@
             }
             ctx.fill();
         }
-        if (f.falcon) {
-            var fc = f.falcon;
-            ctx.fillStyle = rgba(FALCON, 0.55);
-            ctx.beginPath();
-            birdPath(fc.x, fc.y, 0, fc.vx, fc.vy, 0, 0, 0, 0, fc.wing, 3.6);
-            ctx.fill();
-        }
     }
 
     function draw(now) {
         ctx.clearRect(0, 0, vw, vh);
         var a = !built ? 0 : reduced ? 1 : smooth(clamp01(dusk / 0.6));   // the page fades into dusk
         tintText(a);
-        if (!built || (dusk <= 0 && !comets.length && !sparks.length && !meteors.length)) return;
+        if (!built || (dusk <= 0 && !meteors.length && !flock)) return;
         labels.length = 0;
 
         if (a > 0) {
@@ -999,12 +752,11 @@
             ctx.globalAlpha = a;                   // everything in the sky fades with it
             drawStars(now);
             if (moon) drawMoon(clamp01((dusk - 0.45) / 0.5));
-            if (flock) drawFlock();
             ctx.globalAlpha = 1;
         }
 
+        if (flock) drawFlock();                    // dark against the sunset, from the first moment
         drawMeteors(now);
-        drawComets(now);
 
         ctx.font = '11px ' + FONT;
         ctx.textAlign = 'center';
@@ -1017,22 +769,26 @@
     }
 
     // ---- the clock ----
-    function beginDusk(len) {
+    // The evening, in order: the light starts to go, the starlings come in and
+    // the sky holds at sunset while they're out, and only once they've gone
+    // down to roost does night carry on and the stars come out.
+    function beginDusk(len, birds) {
         duskBegun = true;
         duskLen = Math.max(1, len);
         duskRate = 1 / duskLen;
-        nextShootAt = clock + duskLen + 6000 + Math.random() * (activeShower ? 8000 : 30000);
-        if (STARLINGS && !flock) nextFlockAt = clock + duskLen + 2500;
+        if (birds && STARLINGS && !flock) nextFlockAt = clock + duskLen * 0.15;
         if (!PREVIEW) { try { sessionStorage.setItem('night-fell', '1'); } catch (e) { /* ignore */ } }
     }
 
     function tick(now, dt) {
         var sdt = dt * speedMul;
         clock += sdt;
-        if (!duskBegun && clock >= duskAt) beginDusk(duskLen);
+        if (!duskBegun && clock >= duskAt) beginDusk(duskLen, true);
         if (duskRate) {
             dusk = clamp01(dusk + duskRate * sdt);
-            if (dusk >= 1 || dusk <= 0) duskRate = 0;
+            var birdsOut = flock || nextFlockAt < Infinity;
+            if (duskRate > 0 && birdsOut && dusk > SUNSET) dusk = Math.max(SUNSET, dusk - duskRate * sdt);
+            else if (dusk >= 1 || dusk <= 0) duskRate = 0;
         }
 
         var onScreen = mouse.x > -1000;
@@ -1040,24 +796,19 @@
         pm.y += ((onScreen ? mouse.y / vh * 2 - 1 : 0) - pm.y) * 0.04;
         lens += ((onScreen ? 1 : 0) - lens) * 0.06;
 
-        if (dusk >= 0.95 && clock >= nextShootAt) {
-            spawnMeteor(activeShower);
-            nextShootAt = clock + (activeShower ? 4000 + Math.random() * 14000 : 30000 + Math.random() * 80000);
-        }
-        while (burst.length && clock >= burst[0]) {
-            burst.shift();
-            spawnMeteor(showerNear(new Date(), 2.5) || showerNear(new Date(), 0));
-        }
-
-        if (STARLINGS && !flock && dusk >= 1 && clock >= nextFlockAt) {
-            nextFlockAt = Infinity;                  // once a visit, unless called back
-            startFlock();
-        }
+        if (STARLINGS && !flock && clock >= nextFlockAt) startFlock();   // once a visit, unless called back
         if (flock) {
             if (dusk <= 0) flock = null; else updateFlock(now, sdt);
         }
 
-        updateComets(now, dt);
+        // a falling star now and then, once it's properly night
+        if (dusk >= 1 && duskRate >= 0) {
+            if (nextShootAt === Infinity) nextShootAt = clock + 6000 + Math.random() * 20000;
+            else if (clock >= nextShootAt) {
+                spawnMeteor();
+                nextShootAt = clock + 30000 + Math.random() * 50000;
+            }
+        }
     }
 
     function loop(now) {
@@ -1066,7 +817,7 @@
         lastReal = now;
         tick(now, dt);
         draw(now);
-        if (built || comets.length || sparks.length || meteors.length) {
+        if (built || meteors.length) {
             raf = requestAnimationFrame(loop);
         } else {
             running = false;
@@ -1085,21 +836,15 @@
     if (!reduced) {
         window.addEventListener('pointermove', function (e) {
             if (e.pointerType && e.pointerType !== 'mouse' && e.pointerType !== 'pen') return;
-            var now = performance.now();
             mouse.x = e.clientX;
             mouse.y = e.clientY;
-            samples.push({ x: e.clientX, y: e.clientY, t: now });
-            while (samples.length && now - samples[0].t > 320) samples.shift();
-            maybeLaunch(now);
         }, { passive: true });
 
         document.documentElement.addEventListener('mouseleave', function () {
             mouse.x = mouse.y = -1e4;
-            samples.length = 0;
         });
 
-        // Touch: a fast sideways flick throws a comet; a tap reveals what a hover
-        // would (the moon's phase, a constellation).
+        // Touch: a tap reveals what a hover would (the moon's phase, a constellation).
         var touch0 = null, clearTouch = null;
         function touchPoint(e) { var p = e.changedTouches[0]; return { x: p.clientX, y: p.clientY }; }
         document.addEventListener('touchstart', function (e) {
@@ -1107,16 +852,12 @@
             var p = touchPoint(e);
             touch0 = { x: p.x, y: p.y, t: performance.now() };
             clearTimeout(clearTouch);
-            samples.length = 0;
         }, { passive: true });
         document.addEventListener('touchmove', function (e) {
             if (!touch0) return;
-            var p = touchPoint(e), now = performance.now();
+            var p = touchPoint(e);
             mouse.x = p.x;
             mouse.y = p.y;
-            samples.push({ x: p.x, y: p.y, t: now });
-            while (samples.length && now - samples[0].t > 320) samples.shift();
-            maybeLaunch(now, true);
         }, { passive: true });
         document.addEventListener('touchend', function (e) {
             if (!touch0) return;
@@ -1173,7 +914,7 @@
         }
         if (dusk >= 1 || duskRate > 0) return '☾ already out';
         duskAt = clock;
-        beginDusk(typeof seconds === 'number' ? Math.max(0, seconds * 1000) : 6000);
+        beginDusk(typeof seconds === 'number' ? Math.max(0, seconds * 1000) : 6000, false);
         wake();
         return '☾ ' + phaseName(moonPhase()) + ' tonight';
     };
@@ -1181,6 +922,8 @@
     window.day = function () {
         duskAt = Infinity;                        // and don't let it fall again on its own
         duskBegun = true;
+        nextFlockAt = Infinity;
+        nextShootAt = Infinity;
         if (dusk <= 0) return '☀︎ it is day';
         if (reduced) {
             dusk = 0;
@@ -1193,46 +936,26 @@
         return '☀︎ until next time';
     };
 
-    window.comet = function () {
-        if (reduced) return '(comets are resting: reduced motion is on)';
-        ensureCanvas();
-        launchScripted();
-        return '☄︎';
-    };
-
-    window.shower = function () {
-        if (reduced) return '(meteors are resting: reduced motion is on)';
-        var wait = 0;
-        if (dusk < 0.9) { window.night(3); wait = 3500; }
-        for (var i = 0; i < 10; i++) burst.push(clock + wait + i * 450 + Math.random() * 400);
-        burst.sort(function (a, b) { return a - b; });
-        wake();
-        if (activeShower) return '☄︎ the ' + activeShower.name + ' are at their peak about now';
-        var next = showerNear(new Date(), 0);
-        return '☄︎ a preview. next real one: the ' + next.name + ', peaking ' + next.day + ' ' + MONTHS[next.month];
-    };
-
     window.starlings = function () {
         if (reduced) return '(the starlings are resting: reduced motion is on)';
         if (!STARLINGS) return '(no starlings tonight)';
         if (flock) return '⌒ already here';
-        falconNext = true;
-        if (dusk < 1) {
-            window.night(3);
-            nextFlockAt = clock + 3500;
+        ensureCanvas();
+        if (!built) buildSky();
+        if (dusk <= 0 && duskRate <= 0) {         // the whole evening, from the start
+            duskAt = clock;
+            beginDusk(10000, true);
         } else {
             startFlock();
         }
         wake();
-        return '⌒ starlings, coming in (and a peregrine, watching)';
+        return '⌒ starlings, coming in';
     };
 
     window.sky = {
         night: window.night,
         starlings: window.starlings,
         day: window.day,
-        comet: window.comet,
-        shower: window.shower,
         speed: function (n) {
             speedMul = typeof n === 'number' && n > 0 ? Math.min(n, 50) : 1;
             return '⏩ time ×' + speedMul;
@@ -1244,9 +967,9 @@
         dusk = 0;
         duskRate = 0;
         duskBegun = false;
-        comets.length = 0;
-        sparks.length = 0;
+        meteors.length = 0;
         flock = null;
+        nextFlockAt = Infinity;
         duskAt = clock + 10000;
         duskLen = 10000;
         wake();
@@ -1260,8 +983,6 @@
         var speedBtn;
         [['day', function () { window.day(); }],
          ['night', function () { window.night(4); }],
-         ['comet', function () { window.comet(); }],
-         ['shower', function () { window.shower(); }],
          ['starlings', function () { window.starlings(); }],
          ['replay', replay],
          ['×1', function () {
@@ -1283,9 +1004,7 @@
     if (PREVIEW) devPanel();
 
     try {
-        console.log(activeShower
-            ? '%c☄︎ the ' + activeShower.name + ' peak around now. stay for nightfall  (night() if impatient)'
-            : '%c☾ stay a while: evening comes around here  (night() if impatient)',
+        console.log('%c☾ stay a while: evening comes around here  (night() if impatient)',
             'color:#6c757d;font-family:Menlo,monospace;font-size:11px');
     } catch (e) { /* ignore */ }
 })();
