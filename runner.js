@@ -9,6 +9,7 @@
     var H = 176, GROUND = 142;
     var GRAV = 2400, JUMP_V = 520, HOLD_GRAV = 0.42, HOLD_MAX = 0.24, DIVE_GRAV = 2.4;
     var CLAY = [201, 110, 80];
+    var FONT = '"Source Serif 4", Georgia, serif';     // the site's typeface (style.css --serif)
 
     function rgba(c, a) { return 'rgba(' + c[0] + ',' + c[1] + ',' + c[2] + ',' + a + ')'; }
 
@@ -19,9 +20,10 @@
     var jumpHeld = false, duckHeld = false, touchy = false, pace = 1;
 
     var rover, obstacles, debris, pickups, pops, craters;
-    var speed, dist, bonus, nextSpawn, nextPickup, holdT, newBest;
-    var hi = 0;
-    try { hi = parseInt(localStorage.getItem('rover-hi') || '0', 10) || 0; } catch (e) { /* ignore */ }
+    var speed, dist, bonus, nextSpawn, nextPickup, holdT, newBest, runT, lastGap;
+    // (a new key: bests from the old, gentler game don't carry over)
+    var HI_KEY = 'rover-best', hi = 0;
+    try { hi = parseInt(localStorage.getItem(HI_KEY) || '0', 10) || 0; } catch (e) { /* ignore */ }
 
     // Rolling hills: a few sine waves, sampled as the world scrolls past.
     function hill(x, seed, amp) {
@@ -38,7 +40,9 @@
         speed = 280 * pace;
         dist = 0;
         bonus = 0;
+        runT = 0;
         nextSpawn = 520;
+        lastGap = 520;
         nextPickup = 900;
         holdT = 0;
         newBest = false;
@@ -51,9 +55,26 @@
 
     function score() { return Math.floor(dist / 12) + bonus; }
 
+    // How far into a run we are, 0 to 1 over the first hundred seconds or so.
+    function level() { return Math.min(1, runT / 100); }
+
+    // It never stops speeding up: quickly at first, then a steady creep, up to a
+    // pace that takes real concentration (~2 minutes in).
+    function speedAt(T) {
+        return pace * Math.min(1000, 280 + 360 * (1 - Math.exp(-T / 35)) + 3.2 * T);
+    }
+
+    // The closest two obstacles can ever be, start to start: one plain jump's
+    // worth of ground, plus time to land and react.
+    function minGap() {
+        var air = 2 * JUMP_V / GRAV;
+        return speed * (air + 0.12) + 90;
+    }
+
     function spawnRocks() {
-        var n = Math.random() < 0.55 ? 1 : (Math.random() < 0.7 ? 2 : 3);
-        var tall = speed > 360 && Math.random() < 0.25;
+        var lv = level();
+        var n = Math.random() < 0.55 - 0.2 * lv ? 1 : (Math.random() < 0.7 - 0.25 * lv ? 2 : 3);
+        var tall = speed > 360 * pace && Math.random() < 0.2 + 0.3 * lv;
         var parts = [], dx = 0;
         for (var i = 0; i < n; i++) {
             var h = tall ? 28 + Math.random() * 8 : (Math.random() < 0.6 ? 13 + Math.random() * 8 : 20 + Math.random() * 8);
@@ -66,11 +87,16 @@
 
     // Tumbling bits of an old satellite, drifting at head height: duck, or time a jump.
     function spawnDebris() {
-        var low = Math.random() < 0.75;
+        var lv = level();
+        var low = Math.random() < 0.75 - 0.2 * lv;
+        // debris drifts faster than the ground, so it gains on whatever is ahead
+        // of it; never let it close the gap to less than a fair one
+        var travel = (W + 20 - rover.x) / speed;
+        var drift = Math.min(40 + 60 * lv + Math.random() * 40, Math.max(0, (lastGap - minGap()) / travel));
         debris.push({
             x: W + 20, y: low ? GROUND - 31 : GROUND - 62, r: 7 + Math.random() * 2,
             rot: Math.random() * 6.28, spin: (Math.random() < 0.5 ? -1 : 1) * (2 + Math.random() * 3),
-            drift: 40 + Math.random() * 40
+            drift: drift
         });
     }
 
@@ -106,7 +132,7 @@
         if (s > hi) {
             hi = s;
             newBest = true;
-            try { localStorage.setItem('rover-hi', String(hi)); } catch (e) { /* ignore */ }
+            try { localStorage.setItem(HI_KEY, String(hi)); } catch (e) { /* ignore */ }
         }
     }
 
@@ -122,7 +148,8 @@
         rover.duck += ((duckHeld && rover.grounded ? 1 : 0) - rover.duck) * Math.min(1, dt * 18);
         if (!running || dead) return;
 
-        speed = Math.min(620 * pace, speed + 6 * pace * dt);
+        runT += dt;
+        speed = speedAt(runT);
         dist += speed * dt;
         var i, move = speed * dt;
 
@@ -141,11 +168,15 @@
         }
         rover.tilt += ((rover.grounded ? 0 : Math.max(-0.25, Math.min(0.25, rover.vy * 0.0005))) - rover.tilt) * Math.min(1, dt * 12);
 
-        // what's coming: rocks from the start, debris once you're moving
+        // what's coming: rocks from the start, debris once you're moving. The
+        // gaps shrink as the run goes on, and later on some come in tight pairs.
         nextSpawn -= move;
         if (nextSpawn <= 0) {
-            if (score() > 120 && Math.random() < 0.3) spawnDebris(); else spawnRocks();
-            nextSpawn = (330 + Math.random() * 360) * pace + speed * 0.35;
+            var lv = level();
+            if (score() > 120 && Math.random() < 0.25 + 0.2 * lv) spawnDebris(); else spawnRocks();
+            var gap = speed * (1.25 - 0.63 * lv + Math.random() * (1.1 - 0.5 * lv));
+            if (Math.random() < 0.35 * lv) gap = minGap() * (1 + Math.random() * 0.15);
+            lastGap = nextSpawn = Math.max(minGap(), gap);
         }
         nextPickup -= move;
         if (nextPickup <= 0) {
@@ -353,6 +384,18 @@
 
     function pad(n) { var s = String(n); while (s.length < 5) s = '0' + s; return s; }
 
+    // Right-aligned text whose digits all take the same width, so a ticking
+    // score holds still in a proportional font.
+    function fillFixed(str, right, y) {
+        var cell = ctx.measureText('0').width, x = right;
+        ctx.textAlign = 'center';
+        for (var i = str.length - 1; i >= 0; i--) {
+            var ch = str[i], w = ch >= '0' && ch <= '9' ? cell : ctx.measureText(ch).width;
+            x -= w;
+            ctx.fillText(ch, x + w / 2, y);
+        }
+    }
+
     function draw() {
         ctx.clearRect(0, 0, W, H);
         var i;
@@ -379,7 +422,7 @@
         for (i = 0; i < debris.length; i++) drawDebris(debris[i]);
         drawRover(rover, dist / 5.5, rover.grounded && running && !dead, dead);
 
-        ctx.font = "11px 'Menlo', 'Monaco', monospace";
+        ctx.font = '12px ' + FONT;
         ctx.textBaseline = 'alphabetic';
         ctx.textAlign = 'center';
         for (i = 0; i < pops.length; i++) {
@@ -389,9 +432,8 @@
         }
 
         // score
-        ctx.textAlign = 'right';
         ctx.fillStyle = rgba(INK, 0.75);
-        ctx.fillText((hi > 0 ? 'HI ' + pad(hi) + '   ' : '') + pad(score()), W - 56, 38);
+        fillFixed((hi > 0 ? 'HI ' + pad(hi) + '   ' : '') + pad(score()), W - 56, 38);
 
         ctx.textAlign = 'center';
         if (!running && !dead) {
@@ -427,7 +469,7 @@
 
     function sizeCanvas() {
         W = Math.max(280, window.innerWidth);
-        pace = Math.max(0.72, Math.min(1, W / 900));
+        pace = Math.max(0.72, Math.min(1.12, W / 900));   // a wide screen shows more, so it runs a touch faster
         var dpr = Math.min(2, window.devicePixelRatio || 1);
         canvas.width = W * dpr;
         canvas.height = H * dpr;
@@ -463,8 +505,7 @@
         x.textContent = '×';
         x.setAttribute('aria-label', 'Close the game');
         x.style.cssText = 'position:absolute;top:18px;right:12px;width:32px;height:32px;border:0;' +
-            'border-radius:50%;background:rgba(255,255,255,0.35);color:rgb(62,74,94);font:18px/32px ' +
-            'ui-sans-serif,system-ui,sans-serif;cursor:pointer;padding:0;';
+            'border-radius:50%;background:rgba(255,255,255,0.35);color:rgb(62,74,94);font:18px/32px ' + FONT + ';cursor:pointer;padding:0;';
         x.addEventListener('click', function (e) { e.stopPropagation(); close(); });
         strip.appendChild(x);
 
@@ -603,7 +644,7 @@
         var want = p.state === 'idle' && (p.over || touchy || document.activeElement === p.el) ? 1 : 0;
         p.hover += (want - p.hover) * 0.12;
         if (p.hover > 0.01) {
-            g.font = "10px 'Menlo', 'Monaco', monospace";
+            g.font = '11px ' + FONT;
             g.textAlign = 'right';
             g.textBaseline = 'alphabetic';
             g.fillStyle = rgba(INK, 0.75 * p.hover);

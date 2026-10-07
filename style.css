@@ -1,5 +1,15 @@
 /* Shared design system. Page-specific rules stay in each page's <style> block. */
 
+/* One typeface for the whole site, self-hosted so it looks the same in every
+   browser. Variable: weights 300 to 700 and optical sizes from the one file. */
+@font-face {
+    font-family: "Source Serif 4";
+    src: url("fonts/source-serif-4.woff2") format("woff2");
+    font-weight: 300 700;
+    font-style: normal;
+    font-display: swap;
+}
+
 :root {
     --bg: #f9fafb;
     --text: #18181b;
@@ -8,7 +18,7 @@
     --rule: #e4e4e7;
     --rule-soft: #ededf0;
 
-    --serif: ui-serif, Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, serif;
+    --serif: "Source Serif 4", Georgia, serif;
     --sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
             Roboto, "Helvetica Neue", Arial, sans-serif;
 
@@ -24,7 +34,7 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
-    font-family: var(--sans);
+    font-family: var(--serif);
     font-size: 17px;
     line-height: 1.65;
     color: var(--text);
