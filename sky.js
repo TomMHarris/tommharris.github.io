@@ -23,7 +23,7 @@
     var DIM_DAY = [113, 113, 122], DIM_DUSK = [70, 72, 82];
     var WHITE = [255, 255, 255];
     var INK = [84, 96, 110];
-    var FONT = '"Source Serif 4", Georgia, serif';     // the site's typeface (style.css --serif)
+    var FONT = '"Helvetica Neue", Helvetica, Arial, sans-serif';     // the site's typeface (style.css --font)
     var rad = Math.PI / 180;
 
     function clamp01(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }

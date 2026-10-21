@@ -9,7 +9,7 @@
     var H = 176, GROUND = 142;
     var GRAV = 2400, JUMP_V = 520, HOLD_GRAV = 0.42, HOLD_MAX = 0.24, DIVE_GRAV = 2.4;
     var CLAY = [201, 110, 80];
-    var FONT = '"Source Serif 4", Georgia, serif';     // the site's typeface (style.css --serif)
+    var FONT = '"Helvetica Neue", Helvetica, Arial, sans-serif';     // the site's typeface (style.css --font)
 
     function rgba(c, a) { return 'rgba(' + c[0] + ',' + c[1] + ',' + c[2] + ',' + a + ')'; }
 

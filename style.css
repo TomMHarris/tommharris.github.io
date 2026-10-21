@@ -1,15 +1,5 @@
 /* Shared design system. Page-specific rules stay in each page's <style> block. */
 
-/* One typeface for the whole site, self-hosted so it looks the same in every
-   browser. Variable: weights 300 to 700 and optical sizes from the one file. */
-@font-face {
-    font-family: "Source Serif 4";
-    src: url("fonts/source-serif-4.woff2") format("woff2");
-    font-weight: 300 700;
-    font-style: normal;
-    font-display: swap;
-}
-
 :root {
     --bg: #f9fafb;
     --text: #18181b;
@@ -18,9 +8,8 @@
     --rule: #e4e4e7;
     --rule-soft: #ededf0;
 
-    --serif: "Source Serif 4", Georgia, serif;
-    --sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-            Roboto, "Helvetica Neue", Arial, sans-serif;
+    /* One typeface for the whole site: the system Helvetica Neue stack. */
+    --font: "Helvetica Neue", Helvetica, Arial, sans-serif;
 
     /* kept so any page rule still referencing these stays sane */
     --text-primary: var(--text);
@@ -34,7 +23,7 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
-    font-family: var(--serif);
+    font-family: var(--font);
     font-size: 17px;
     line-height: 1.65;
     color: var(--text);
@@ -73,7 +62,7 @@ nav {
 }
 
 .nav-name {
-    font-family: var(--serif);
+    font-family: var(--font);
     font-weight: 300;
     font-size: 1.9rem;
     line-height: 1.1;
@@ -87,8 +76,8 @@ nav {
 .nav-links { display: flex; flex-wrap: wrap; gap: 1.75rem; min-width: 0; }
 
 .nav-links a {
-    /* Serif, to sit in the same voice as the wordmark. */
-    font-family: var(--serif);
+    /* Same voice as the wordmark. */
+    font-family: var(--font);
     color: var(--text-dim);
     font-weight: 400;
     font-size: 1.08rem;
